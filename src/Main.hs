@@ -1,42 +1,72 @@
 module Main where
 
-import Options.Applicative
+import Data.Maybe
+import Control.Applicative
+import Options.Applicative as Opts
 import Text.Blaze.Html.Renderer.String
 
 import ParseMd
 
-data Sample = Sample
-	{ input :: String
-	, quiet :: Bool
+data Params = Params
+	{ inputPath :: String
+	, outputPath :: String
+	, headerPath :: Maybe String
+	, footerPath :: Maybe String
 	}
 
-headerPath = "html/header.html"
-footerPath = "html/footer.html"
+defaultHeaderPath :: String
+defaultHeaderPath = "html/header.html"
 
-sample :: Parser Sample
-sample = Sample
-	<$> strOption
-		( long "input"
-		<> metavar "TARGET"
-		<> help "Target for the greeting" )
-	<*> switch
-		( long "quiet"
-		<> help "Whether to be quiet" )
+defaultFooterPath :: String
+defaultFooterPath = "html/footer.html"
 
-greet :: Sample -> IO ()
-greet (Sample path False) =
-	do	file <- readFile path
-		header <- readFile headerPath
-		footer <- readFile footerPath
+inputParser :: Parser String
+inputParser = strOption $
+	long "input"
+	<> short 'i'
+	<> metavar "FILE"
+	<> help "The input path."
+
+outputParser :: Parser String
+outputParser = strOption $
+	long "output"
+	<> short 'o'
+	<> metavar "TARGET"
+	<> help "The output path."
+
+headerParser :: Parser (Maybe String)
+headerParser = optional . strOption $
+	long "header"
+	<> short 'h'
+	<> metavar "FILE"
+	<> help "A custom header to insert before the output."
+
+footerParser :: Parser (Maybe String)
+footerParser = optional . strOption $
+	long "footer"
+	<> short 'f'
+	<> metavar "FILE"
+	<> help "A custom footer to insert after the output."
+
+parser :: Parser Params
+parser = Params
+	<$> inputParser
+	<*> outputParser
+	<*> headerParser
+	<*> footerParser
+
+revealify :: Params -> IO ()
+revealify params =
+	do	file <- readFile $ inputPath params
+		headerFile <- readFile $ fromMaybe defaultHeaderPath (headerPath params)
+		footerFile <- readFile $ fromMaybe defaultFooterPath (footerPath params)
 		let html = markDownToslides file
-		putStrLn $ header ++ renderHtml html ++ footer
-		return ()
-greet _ = return ()
+		writeFile (outputPath params) $ headerFile ++ renderHtml html ++ footerFile
 
 main :: IO ()
-main = execParser opts >>= greet
+main = execParser opts >>= revealify
 	where
-		opts = info (helper <*> sample)
+		opts = info (helper <*> parser)
 			(fullDesc
-				<> progDesc "Print a greeting for TARGET"
-				<> header "hello - a test for optparse-applicative" )
+				<> progDesc "Markdown to Reveal.js"
+				<> header "MarkdownToReveal" )
