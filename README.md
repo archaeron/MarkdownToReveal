@@ -29,6 +29,6 @@ add x y = x + y
 MarkdownToReveal -i path/to/markdown -o path/to/output
 ```
 
-The output file should be in the same folde as the index.html of reveal.js,
-so the top level directory and can be called however you like it.
+The output file should be in the same folde as the index.html of reveal.js and
+can be called however you like it.
 You can put as many presentations in the same folder as you want.
