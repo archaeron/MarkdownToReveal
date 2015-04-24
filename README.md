@@ -17,13 +17,13 @@ This it a slide
 
 You can put code in here
 
-```haskell
+\```haskell
 add x y = x + y
-```
+\```
 
 ```
 
-## Compileation
+## Compilation
 
 ```sh
 MarkdownToReveal -i path/to/markdown -o path/to/output
