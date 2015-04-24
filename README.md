@@ -15,7 +15,7 @@ This it a slide
 
 ---
 
-You can put code in here
+You can put code in here (remove the backslashes):
 
 \```haskell
 add x y = x + y
