@@ -56,6 +56,8 @@ executable MDToReveal
   -- LANGUAGE extensions used by modules in this package.
   -- other-extensions:
 
+  ghc-options:         -fno-warn-tabs
+
   -- Other library packages from which modules are imported.
   build-depends:       base >=4.7 && <4.9
                     ,  optparse-applicative
